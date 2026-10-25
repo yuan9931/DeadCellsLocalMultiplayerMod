@@ -1,0 +1,14 @@
+bin/
+obj/
+.vs/
+*.user
+*.suo
+/dccm
+dccm.zip
+/win-x64.zip
+
+
+# Localization catalogs are generated from Resourcefile/lang/main.zh.po by Tools/gen_mo.py
+# (the .po is the single source of truth). The build regenerates them, so they are never
+# committed — a stale .mo would silently ship translations that no longer match the .po.
+Resourcefile/lang/*.mo

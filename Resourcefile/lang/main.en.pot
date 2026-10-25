@@ -1,0 +1,365 @@
+# Auto-generated from main.zh.po
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+
+#: ModEntry.cs
+msgid "Local Co-op"
+msgstr ""
+
+#: ModEntry.cs
+msgid "Two heroes, one screen - session active"
+msgstr ""
+
+#: ModEntry.cs
+msgid "Play together on this computer"
+msgstr ""
+
+#: ModEntry.cs
+msgid "LOCAL CO-OP / DEVICES"
+msgstr ""
+
+#: ModEntry.cs
+msgid "Both players may pick the same device."
+msgstr ""
+
+#: ModEntry.cs
+msgid "Player 1: {0}   < Change >"
+msgstr ""
+
+#: ModEntry.cs
+msgid "Player 2: {0}   < Change >"
+msgstr ""
+
+#: ModEntry.cs
+msgid "Back"
+msgstr ""
+
+#: ModEntry.cs
+msgid "Disable local co-op"
+msgstr ""
+
+#: ModEntry.cs
+msgid "LOCAL CO-OP / CAMERA"
+msgstr ""
+
+#: ModEntry.cs
+msgid "Camera: {0}   < Toggle >"
+msgstr ""
+
+#: ModEntry.cs
+msgid "Zoom out limit: {0}   < Change >"
+msgstr ""
+
+#: ModEntry.cs
+msgid "LOCAL CO-OP / PLAYER 2 SKIN"
+msgstr ""
+
+#: ModEntry.cs
+msgid "Player 2 skin: {0}   < Change >"
+msgstr ""
+
+#: ModEntry.cs
+msgid "LOCAL CO-OP READY"
+msgstr ""
+
+#: ModEntry.cs
+msgid "P1: {0}   P2: {1}"
+msgstr ""
+
+#: ModEntry.cs
+msgid "Camera: {0}"
+msgstr ""
+
+#: ModEntry.cs
+msgid "Change devices"
+msgstr ""
+
+#: ModEntry.cs
+msgid "Back to title"
+msgstr ""
+
+#: ModEntry.cs
+msgid "LOCAL CO-OP"
+msgstr ""
+
+#: ModEntry.cs
+msgid "Devices"
+msgstr ""
+
+#: ModEntry.cs
+msgid "Camera"
+msgstr ""
+
+#: ModEntry.cs
+msgid "Player 2 skin"
+msgstr ""
+
+#: ModEntry.cs
+msgid "Keep these devices"
+msgstr ""
+
+#: ModEntry.cs
+msgid "Start local co-op"
+msgstr ""
+
+#: ModEntry.cs
+msgid "Player one's input device."
+msgstr ""
+
+#: ModEntry.cs
+msgid "Turn the session off; new runs are single-player again."
+msgstr ""
+
+#: ModEntry.cs
+msgid "Follow both heroes and zoom the one window so both stay visible, or follow player 1 only."
+msgstr ""
+
+#: ModEntry.cs
+msgid "How far the camera may zoom out to keep both heroes on screen."
+msgstr ""
+
+#: ModEntry.cs
+msgid "Player two's outfit. Defaults to a skin different from player one's; cycles every wearable skin in the game, then 'same as P1'. Takes effect on the next run."
+msgstr ""
+
+#: ModEntry.cs
+msgid "Start a run from the main menu to play together. Either hero dying ends the run."
+msgstr ""
+
+#: ModEntry.cs
+msgid "Start a run from the main menu to play together."
+msgstr ""
+
+#: ModEntry.cs
+msgid "Session active: every new run uses two heroes."
+msgstr ""
+
+#: ModEntry.cs
+msgid "Two heroes share health, inventory and attributes. Pick a device for each player."
+msgstr ""
+
+#: ModEntry.cs
+msgid "One window for both heroes: follow both and zoom out, or follow player 1 only."
+msgstr ""
+
+#: ModEntry.cs
+msgid "Give player two its own outfit."
+msgstr ""
+
+#: ModEntry.cs
+msgid "Camera follows both heroes and zooms out to {0}"
+msgstr ""
+
+#: ModEntry.cs
+msgid "Camera follows player 1"
+msgstr ""
+
+#: ModEntry.cs
+msgid "both heroes (zoom out)"
+msgstr ""
+
+#: ModEntry.cs
+msgid "player 1 only"
+msgstr ""
+
+#: ModEntry.cs
+msgid "Rules"
+msgstr ""
+
+#: ModEntry.cs
+msgid "Shared health, equipment, friendly fire and player two's skin."
+msgstr ""
+
+#: ModEntry.cs
+msgid "LOCAL CO-OP / RULES"
+msgstr ""
+
+#: ModEntry.cs
+msgid "Shared health: {0}   < Toggle >"
+msgstr ""
+
+#: ModEntry.cs
+msgid "shared"
+msgstr ""
+
+#: ModEntry.cs
+msgid "independent"
+msgstr ""
+
+#: ModEntry.cs
+msgid "Share one health pool between both heroes, or give each hero its own life. Independent: a downed hero stays down (run continues) and revives at 1 HP on the next level; the run ends only when all heroes are down."
+msgstr ""
+
+#: ModEntry.cs
+msgid "Friendly fire: {0}   < Toggle >"
+msgstr ""
+
+#: ModEntry.cs
+msgid "on"
+msgstr ""
+
+#: ModEntry.cs
+msgid "off"
+msgstr ""
+
+#: ModEntry.cs
+msgid "Let the two heroes damage each other."
+msgstr ""
+
+#: ModEntry.cs
+msgid "Camera: {0} | Health: {1}"
+msgstr ""
+
+#: ModEntry.cs
+msgid "Equipment: {0} | Friendly fire: {1}"
+msgstr ""
+
+#: ModEntry.cs
+msgid "Equipment: {0}   < Toggle >"
+msgstr ""
+
+#: ModEntry.cs
+msgid "Share one backpack between both heroes, or give each hero its own weapons, skills, scroll tiers and flask. Shared: the flask, the tiers, the ring, the mutations and the item cooldowns are one shared set. Independent: gold, cells and unlocks stay shared."
+msgstr ""
+
+#: ModEntry.cs
+msgid "LOCAL CO-OP / MOD SETTINGS"
+msgstr ""
+
+#: ModEntry.cs
+msgid "LOCAL CO-OP / INPUT DEVICES"
+msgstr ""
+
+#: ModEntry.cs
+msgid "LOCAL CO-OP / MOD INFO"
+msgstr ""
+
+#: ModEntry.cs
+msgid "Mod settings"
+msgstr ""
+
+#: ModEntry.cs
+msgid "Input devices"
+msgstr ""
+
+#: ModEntry.cs
+msgid "Mod info"
+msgstr ""
+
+#: ModEntry.cs
+msgid "Version: {0}"
+msgstr ""
+
+#: ModEntry.cs
+msgid "Local co-op for Dead Cells on the DCCM MDK."
+msgstr ""
+
+#: ModEntry.cs
+msgid "Two heroes, one window, one device per player."
+msgstr ""
+
+#: ModEntry.cs
+msgid "Camera and the run rules: shared health, equipment, friendly fire, player two's skin."
+msgstr ""
+
+#: ModEntry.cs
+msgid "Version and what this mod does."
+msgstr ""
+
+#: ModEntry.cs
+msgid "auto (differs from P1)"
+msgstr ""
+
+#: ModEntry.cs
+msgid "same as P1"
+msgstr ""
+
+#: ModEntry.cs
+msgid "Shared health, equipment and friendly fire."
+msgstr ""
+
+#: ModEntry.cs
+msgid "PVP ARENA"
+msgstr ""
+
+#: ModEntry.cs
+msgid "PvP arena"
+msgstr ""
+
+#: ModEntry.cs
+msgid "Two players, one arena, own health and forced friendly fire."
+msgstr ""
+
+#: ModEntry.cs
+msgid "PvP mode: {0}   < Toggle >"
+msgstr ""
+
+#: ModEntry.cs
+msgid "Off: the two heroes cooperate as usual. On: the arena is played, where each hero has its own health and they always damage each other."
+msgstr ""
+
+#: ModEntry.cs
+msgid "Rounds to win: {0}   < Change >"
+msgstr ""
+
+#: ModEntry.cs
+msgid "How many rounds a player must take to win the match."
+msgstr ""
+
+#: ModEntry.cs
+msgid "Start a match now"
+msgstr ""
+
+#: ModEntry.cs
+msgid "Start a match   (last: P{0} {1})"
+msgstr ""
+
+#: ModEntry.cs
+msgid "Opens the arena: both players fight in an empty training hall — no mobs, no loot, no exit. Leave with the pause menu; the score panel sits in the top-left corner. Gear follows the Rules setting."
+msgstr ""
+
+#: ModEntry.cs
+msgid "Two players, one arena: own health, forced friendly fire, first to the round target wins."
+msgstr ""
+
+#: ModEntry.cs
+msgid "MOD SETTINGS   v{0}"
+msgstr ""
+
+#: ModEntry.cs
+msgid "Let the two heroes damage each other. In a PvP match this is forced on."
+msgstr ""
+
+#: ModEntry.cs
+msgid "Hold {0} to go back"
+msgstr ""
+
+#: ModEntry.cs
+msgid "Hold {0} to teleport"
+msgstr ""
+
+#: ModEntry.cs
+msgid "PVP ARENA / MATCH RULES"
+msgstr ""
+
+#: ModEntry.cs
+msgid "Match rules"
+msgstr ""
+
+#: ModEntry.cs
+msgid "How long a match lasts, and how much health each hero has."
+msgstr ""
+
+#: ModEntry.cs
+msgid "Health: {0}   < Change >"
+msgstr ""
+
+#: ModEntry.cs
+msgid "How much health each hero has in a match: the normal pool, or 2x / 5x / 10x it, so a round lasts longer. Applies to both heroes, so the duel stays even."
+msgstr ""
+
+#: ModEntry.cs
+msgid "Both heroes enter with {0} their normal life pool."
+msgstr ""
+

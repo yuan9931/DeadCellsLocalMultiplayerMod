@@ -1,0 +1,365 @@
+# Auto-generated from main.zh.po
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+
+#: ModEntry.cs
+msgid "Local Co-op"
+msgstr "本地同屏"
+
+#: ModEntry.cs
+msgid "Two heroes, one screen - session active"
+msgstr "双英雄，同一屏幕 — 会话进行中"
+
+#: ModEntry.cs
+msgid "Play together on this computer"
+msgstr "在这台电脑上一起玩"
+
+#: ModEntry.cs
+msgid "LOCAL CO-OP / DEVICES"
+msgstr "本地同屏 / 设备"
+
+#: ModEntry.cs
+msgid "Both players may pick the same device."
+msgstr "两名玩家可以选择同一个设备。"
+
+#: ModEntry.cs
+msgid "Player 1: {0}   < Change >"
+msgstr "玩家 1：{0}   < 更改 >"
+
+#: ModEntry.cs
+msgid "Player 2: {0}   < Change >"
+msgstr "玩家 2：{0}   < 更改 >"
+
+#: ModEntry.cs
+msgid "Back"
+msgstr "返回"
+
+#: ModEntry.cs
+msgid "Disable local co-op"
+msgstr "禁用本地同屏"
+
+#: ModEntry.cs
+msgid "LOCAL CO-OP / CAMERA"
+msgstr "本地同屏 / 相机"
+
+#: ModEntry.cs
+msgid "Camera: {0}   < Toggle >"
+msgstr "相机：{0}   < 切换 >"
+
+#: ModEntry.cs
+msgid "Zoom out limit: {0}   < Change >"
+msgstr "最大缩小：{0}   < 更改 >"
+
+#: ModEntry.cs
+msgid "LOCAL CO-OP / PLAYER 2 SKIN"
+msgstr "本地同屏 / 二号英雄外观"
+
+#: ModEntry.cs
+msgid "Player 2 skin: {0}   < Change >"
+msgstr "二号英雄外观：{0}   < 更改 >"
+
+#: ModEntry.cs
+msgid "LOCAL CO-OP READY"
+msgstr "本地同屏就绪"
+
+#: ModEntry.cs
+msgid "P1: {0}   P2: {1}"
+msgstr "玩家1：{0}   玩家2：{1}"
+
+#: ModEntry.cs
+msgid "Camera: {0}"
+msgstr "相机：{0}"
+
+#: ModEntry.cs
+msgid "Change devices"
+msgstr "更改设备"
+
+#: ModEntry.cs
+msgid "Back to title"
+msgstr "返回标题画面"
+
+#: ModEntry.cs
+msgid "LOCAL CO-OP"
+msgstr "本地同屏"
+
+#: ModEntry.cs
+msgid "Devices"
+msgstr "设备"
+
+#: ModEntry.cs
+msgid "Camera"
+msgstr "相机"
+
+#: ModEntry.cs
+msgid "Player 2 skin"
+msgstr "二号英雄外观"
+
+#: ModEntry.cs
+msgid "Keep these devices"
+msgstr "保持这些设备"
+
+#: ModEntry.cs
+msgid "Start local co-op"
+msgstr "开始本地同屏"
+
+#: ModEntry.cs
+msgid "Player one's input device."
+msgstr "玩家 1 的输入设备。"
+
+#: ModEntry.cs
+msgid "Turn the session off; new runs are single-player again."
+msgstr "关闭会话；之后的新游戏将恢复单人模式。"
+
+#: ModEntry.cs
+msgid "Follow both heroes and zoom the one window so both stay visible, or follow player 1 only."
+msgstr "让一个窗口跟随两名英雄并自动缩小以同屏显示，或仅跟随玩家 1。"
+
+#: ModEntry.cs
+msgid "How far the camera may zoom out to keep both heroes on screen."
+msgstr "相机最多能缩小到什么程度，以确保两名英雄都在画面内。"
+
+#: ModEntry.cs
+msgid "Player two's outfit. Defaults to a skin different from player one's; cycles every wearable skin in the game, then 'same as P1'. Takes effect on the next run."
+msgstr "二号英雄的装扮。默认选用与玩家 1 不同的外观；会遍历游戏中所有可穿戴外观，最后回到『与 P1 相同』。下一局生效。"
+
+#: ModEntry.cs
+msgid "Start a run from the main menu to play together. Either hero dying ends the run."
+msgstr "从主菜单开始游戏即可一起游玩。任一英雄死亡都会结束本局。"
+
+#: ModEntry.cs
+msgid "Start a run from the main menu to play together."
+msgstr "从主菜单开始游戏即可一起游玩。"
+
+#: ModEntry.cs
+msgid "Session active: every new run uses two heroes."
+msgstr "会话进行中：每局新游戏都会使用双英雄。"
+
+#: ModEntry.cs
+msgid "Two heroes share health, inventory and attributes. Pick a device for each player."
+msgstr "两名英雄共享生命、背包与属性。请为每位玩家选择设备。"
+
+#: ModEntry.cs
+msgid "One window for both heroes: follow both and zoom out, or follow player 1 only."
+msgstr "两名英雄共用一个窗口：跟随两人并缩小，或仅跟随玩家 1。"
+
+#: ModEntry.cs
+msgid "Give player two its own outfit."
+msgstr "为二号英雄单独设置外观。"
+
+#: ModEntry.cs
+msgid "Camera follows both heroes and zooms out to {0}"
+msgstr "相机跟随两名英雄并缩小至 {0}"
+
+#: ModEntry.cs
+msgid "Camera follows player 1"
+msgstr "相机仅跟随玩家 1"
+
+#: ModEntry.cs
+msgid "both heroes (zoom out)"
+msgstr "两名英雄（自动缩小）"
+
+#: ModEntry.cs
+msgid "player 1 only"
+msgstr "仅玩家 1"
+
+#: ModEntry.cs
+msgid "Rules"
+msgstr "规则"
+
+#: ModEntry.cs
+msgid "Shared health, equipment, friendly fire and player two's skin."
+msgstr "共享血量、装备、友伤与二号英雄皮肤。"
+
+#: ModEntry.cs
+msgid "LOCAL CO-OP / RULES"
+msgstr "本地同屏 / 规则"
+
+#: ModEntry.cs
+msgid "Shared health: {0}   < Toggle >"
+msgstr "共享血量：{0}   < 切换 >"
+
+#: ModEntry.cs
+msgid "shared"
+msgstr "共享"
+
+#: ModEntry.cs
+msgid "independent"
+msgstr "独立"
+
+#: ModEntry.cs
+msgid "Share one health pool between both heroes, or give each hero its own life. Independent: a downed hero stays down (run continues) and revives at 1 HP on the next level; the run ends only when all heroes are down."
+msgstr "两名英雄共享同一血池，或各自拥有独立血量。独立时：倒地的英雄保持倒地（本局继续），下一关卡以 1 血复活；只有所有英雄都倒地才结束本局。"
+
+#: ModEntry.cs
+msgid "Friendly fire: {0}   < Toggle >"
+msgstr "友伤：{0}   < 切换 >"
+
+#: ModEntry.cs
+msgid "on"
+msgstr "开"
+
+#: ModEntry.cs
+msgid "off"
+msgstr "关"
+
+#: ModEntry.cs
+msgid "Let the two heroes damage each other."
+msgstr "允许两名英雄互相造成伤害。"
+
+#: ModEntry.cs
+msgid "Camera: {0} | Health: {1}"
+msgstr "相机：{0} | 血量：{1}"
+
+#: ModEntry.cs
+msgid "Equipment: {0} | Friendly fire: {1}"
+msgstr "装备：{0} | 友伤：{1}"
+
+#: ModEntry.cs
+msgid "Equipment: {0}   < Toggle >"
+msgstr "装备：{0}   < 切换 >"
+
+#: ModEntry.cs
+msgid "Share one backpack between both heroes, or give each hero its own weapons, skills, scroll tiers and flask. Shared: the flask, the tiers, the ring, the mutations and the item cooldowns are one shared set. Independent: gold, cells and unlocks stay shared."
+msgstr "两名英雄共用同一个背包，或各自拥有武器、技能、卷轴层数与血瓶。共享时：血瓶、卷轴层数、戒指、变异与道具冷却都是同一份。独立时：金币、细胞与解锁仍然共享。"
+
+#: ModEntry.cs
+msgid "LOCAL CO-OP / MOD SETTINGS"
+msgstr "本地同屏 / 模组设置"
+
+#: ModEntry.cs
+msgid "LOCAL CO-OP / INPUT DEVICES"
+msgstr "本地同屏 / 输入设备"
+
+#: ModEntry.cs
+msgid "LOCAL CO-OP / MOD INFO"
+msgstr "本地同屏 / 模组信息"
+
+#: ModEntry.cs
+msgid "Mod settings"
+msgstr "模组设置"
+
+#: ModEntry.cs
+msgid "Input devices"
+msgstr "输入设备"
+
+#: ModEntry.cs
+msgid "Mod info"
+msgstr "模组信息"
+
+#: ModEntry.cs
+msgid "Version: {0}"
+msgstr "版本：{0}"
+
+#: ModEntry.cs
+msgid "Local co-op for Dead Cells on the DCCM MDK."
+msgstr "基于 DCCM MDK 的《死亡细胞》本地同屏模组。"
+
+#: ModEntry.cs
+msgid "Two heroes, one window, one device per player."
+msgstr "两位英雄、一个窗口、每人一个输入设备。"
+
+#: ModEntry.cs
+msgid "Camera and the run rules: shared health, equipment, friendly fire, player two's skin."
+msgstr "相机与对局规则：共享血量、装备、友伤、二号英雄皮肤。"
+
+#: ModEntry.cs
+msgid "Version and what this mod does."
+msgstr "版本与本模组的功能简介。"
+
+#: ModEntry.cs
+msgid "auto (differs from P1)"
+msgstr "自动（与 P1 不同）"
+
+#: ModEntry.cs
+msgid "same as P1"
+msgstr "与 P1 相同"
+
+#: ModEntry.cs
+msgid "Shared health, equipment and friendly fire."
+msgstr "共享血量、装备与友伤。"
+
+#: ModEntry.cs
+msgid "PVP ARENA"
+msgstr "PVP 竞技场"
+
+#: ModEntry.cs
+msgid "PvP arena"
+msgstr "PVP 竞技场"
+
+#: ModEntry.cs
+msgid "Two players, one arena, own health and forced friendly fire."
+msgstr "两名玩家，一座竞技场：各自拥有血量，并且强制互相伤害。"
+
+#: ModEntry.cs
+msgid "PvP mode: {0}   < Toggle >"
+msgstr "PVP 模式：{0}   < 切换 >"
+
+#: ModEntry.cs
+msgid "Off: the two heroes cooperate as usual. On: the arena is played, where each hero has its own health and they always damage each other."
+msgstr "关闭：两名英雄照常合作。开启：进入竞技场，每名英雄都有自己的血量，并且始终可以互相伤害。"
+
+#: ModEntry.cs
+msgid "Rounds to win: {0}   < Change >"
+msgstr "夺冠回合数：{0}   < 更改 >"
+
+#: ModEntry.cs
+msgid "How many rounds a player must take to win the match."
+msgstr "一名玩家需要赢下多少回合才能赢下整场比赛。"
+
+#: ModEntry.cs
+msgid "Start a match now"
+msgstr "立即开始一场比赛"
+
+#: ModEntry.cs
+msgid "Start a match   (last: P{0} {1})"
+msgstr "开始一场比赛   （上一场：P{0} {1}）"
+
+#: ModEntry.cs
+msgid "Opens the arena: both players fight in an empty training hall — no mobs, no loot, no exit. Leave with the pause menu; the score panel sits in the top-left corner. Gear follows the Rules setting."
+msgstr "进入竞技场：两名玩家在一座空旷的训练厅里对决——没有怪物、没有掉落、没有出口。用暂停菜单离开；比分显示在屏幕左上角。装备遵循规则页的设置。"
+
+#: ModEntry.cs
+msgid "Two players, one arena: own health, forced friendly fire, first to the round target wins."
+msgstr "两名玩家，一座竞技场：各自拥有血量、强制互相伤害，先达到目标回合数者获胜。"
+
+#: ModEntry.cs
+msgid "MOD SETTINGS   v{0}"
+msgstr "模组设置   v{0}"
+
+#: ModEntry.cs
+msgid "Let the two heroes damage each other. In a PvP match this is forced on."
+msgstr "允许两名英雄互相伤害。在 PVP 比赛中此项强制开启。"
+
+#: ModEntry.cs
+msgid "Hold {0} to go back"
+msgstr "按住 {0} 键返回"
+
+#: ModEntry.cs
+msgid "Hold {0} to teleport"
+msgstr "按住 {0} 键传送"
+
+#: ModEntry.cs
+msgid "PVP ARENA / MATCH RULES"
+msgstr "PVP 竞技场 / 比赛规则"
+
+#: ModEntry.cs
+msgid "Match rules"
+msgstr "比赛规则"
+
+#: ModEntry.cs
+msgid "How long a match lasts, and how much health each hero has."
+msgstr "比赛持续多久，以及每名英雄有多少血量。"
+
+#: ModEntry.cs
+msgid "Health: {0}   < Change >"
+msgstr "血量：{0}   < 更改 >"
+
+#: ModEntry.cs
+msgid "How much health each hero has in a match: the normal pool, or 2x / 5x / 10x it, so a round lasts longer. Applies to both heroes, so the duel stays even."
+msgstr "每名英雄在比赛中拥有多少血量：正常血量，或它的 2 倍 / 5 倍 / 10 倍，让一个回合更耐打。对双方同时生效，因此对决仍然公平。"
+
+#: ModEntry.cs
+msgid "Both heroes enter with {0} their normal life pool."
+msgstr "两名英雄都以正常血量的 {0} 进入竞技场。"
+
