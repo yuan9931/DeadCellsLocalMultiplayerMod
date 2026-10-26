@@ -53,7 +53,7 @@
 
 ## 🧰 环境要求
 
-- **死亡细胞（PC）**
+- **死亡细胞（PC）**——DCCM 对应游戏的 **v35** 分支（如 2026-06-16 的 `8b5231c` 构建）
 - **DCCM（Dead Cells Core Modding API）**
 - **[.NET 10 SDK / Runtime (x64)](https://dotnet.microsoft.com/download/dotnet/10.0)**
 - **[Microsoft Visual C++ Redistributable 2015–2022 (x64)](https://aka.ms/vs/17/release/vc_redist.x64.exe)**（DCCM 运行需要）
@@ -62,9 +62,20 @@
 
 ## 📦 安装
 
-1. 订阅 DCCM Core Modding API(https://steamcommunity.com/sharedfiles/filedetails/?id=3633185550)
-2. 订阅 DeadCellsLocalMultiplayerMod(https://steamcommunity.com/sharedfiles/filedetails/?id=3820679837)
-3. 按照`https://dead-cells-core-modding.github.io/docs/docs/tutorial/install-workshop`，替换游戏本体`deadcells.exe`。
+两种方式：Steam 创意工坊订阅，或手动放入文件。带截图的分步教程见 [bilibili](https://www.bilibili.com/opus/1263440955984314368)，文字版如下。
+
+### 通过 Steam 创意工坊
+
+1. 订阅 [DCCM Core Modding API](https://steamcommunity.com/sharedfiles/filedetails/?id=3633185550)
+2. 订阅 [DeadCellsLocalMultiplayerMod](https://steamcommunity.com/sharedfiles/filedetails/?id=3820679837)
+3. 按 [创意工坊安装指南](https://dead-cells-core-modding.github.io/docs/docs/tutorial/install-workshop) 替换 `deadcells.exe`。
+
+### 手动安装（GitHub Releases）
+
+1. 从 [DCCM Releases](https://github.com/dead-cells-core-modding/core/releases) 下载最新版 `win-x64.zip`，解压到游戏目录，并把解压出的 `core` 文件夹重命名为 `coremod`——布局变成 `Dead Cells\coremod\core\...`。
+2. 从 [本仓库 Releases](https://github.com/yuan9931/DeadCellsLocalMultiplayerMod/releases) 下载最新版 `DeadCellsLocalMultiplayerMod-v*.zip`，解压到 `coremod\mods\`，使模组位于 `coremod\mods\DeadCellsLocalMultiplayerMod\`。
+3. 按 [创意工坊安装指南](https://dead-cells-core-modding.github.io/docs/docs/tutorial/install-workshop) 替换 `deadcells.exe` ,通过 Steam 启动游戏。若不想通过 Steam 启动：在 `coremod` 里新建 `config` 文件夹，把 [modcore.json](https://github.com/yuan9931/DeadCellsLocalMultiplayerMod/releases/download/dccm/modcore.json) 放进去，然后双击 `Dead Cells\coremod\core\host\startup\DeadCellsModding.exe` 启动。
+4. 进入游戏后，左下角会显示 DCCM 已加载的版本号；模组随之加载。
 
 ---
 

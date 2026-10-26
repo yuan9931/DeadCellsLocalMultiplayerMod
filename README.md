@@ -57,16 +57,27 @@ Any feedback helps improve the local co-op experience for Dead Cells.
 
 ## Requirements
 
-- **Dead Cells (PC)**
+- **Dead Cells (PC)** — the DCCM builds track the **v35** branch of the game (e.g. the 2026-06-16 `8b5231c` build)
 - **DCCM (Dead Cells Core Modding API)**
 - **[.NET 10 SDK / Runtime (x64)](https://dotnet.microsoft.com/download/dotnet/10.0)**
 - **[Microsoft Visual C++ Redistributable 2015–2022 (x64)](https://aka.ms/vs/17/release/vc_redist.x64.exe)** (required by DCCM)
 
 ## Installation
 
-1. Subscribe DCCM Core Modding API (https://steamcommunity.com/sharedfiles/filedetails/?id=3633185550)
-2. Subscribe DeadCellsLocalMultiplayerMod (https://steamcommunity.com/sharedfiles/filedetails/?id=3820679837)
-3. Refer to `https://dead-cells-core-modding.github.io/docs/docs/tutorial/install-workshop`, replace `deadcells.exe`。
+Two ways: subscribe on the Steam Workshop, or drop the files in by hand.
+
+### Via Steam Workshop
+
+1. Subscribe [DCCM Core Modding API](https://steamcommunity.com/sharedfiles/filedetails/?id=3633185550)
+2. Subscribe [DeadCellsLocalMultiplayerMod](https://steamcommunity.com/sharedfiles/filedetails/?id=3820679837)
+3. Follow the [workshop install guide](https://dead-cells-core-modding.github.io/docs/docs/tutorial/install-workshop) to replace `deadcells.exe`.
+
+### Manual install (GitHub Releases)
+
+1. Download the latest `win-x64.zip` from [DCCM releases](https://github.com/dead-cells-core-modding/core/releases), extract it into the game directory, and rename the extracted `core` folder to `coremod` — the layout becomes `Dead Cells\coremod\core\...`.
+2. Download the latest `DeadCellsLocalMultiplayerMod-v*.zip` from [this repository's releases](https://github.com/yuan9931/DeadCellsLocalMultiplayerMod/releases), extract it into `coremod\mods\` so the mod sits at `coremod\mods\DeadCellsLocalMultiplayerMod\`.
+3. Follow the [workshop install guide](https://dead-cells-core-modding.github.io/docs/docs/tutorial/install-workshop) to replace `deadcells.exe`. Launch the game through Steam. If you would rather not launch via Steam: create `coremod\config\`, put [modcore.json](https://github.com/yuan9931/DeadCellsLocalMultiplayerMod/releases/download/dccm/modcore.json) into it, then run `Dead Cells\coremod\core\host\startup\DeadCellsModding.exe`.
+4. In-game, DCCM's loaded version shows in the bottom-left corner; the mod loads with it.
 
 ## How to play
 
