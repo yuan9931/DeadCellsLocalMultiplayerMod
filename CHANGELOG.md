@@ -6,6 +6,21 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 project uses a `MAJOR.MINOR.PATCH` scheme where the PATCH digit moves for every
 user-visible fix or feature.
 
+## [0.1.27] — 2026-10-27
+
+### Fixed
+
+- **The full-screen map can be panned again.** `MiniMap.update()` treats a non-null
+  `followEntity` as "follow mode" and dispatches the pan only behind that test, so a follow target
+  makes the map re-centre on it and never reach `handleWorldMapMovements()` — the player's stick or
+  arrow input is silently dropped and the map looks frozen. The minimap hook restored
+  `followEntity` on the full-screen branch (to hand the corner map back to the game), which
+  re-armed follow mode on every frame of the browse screen. The full-screen branch now leaves the
+  field exactly as the game set it and just runs the game's own update — follow mode there is the
+  player's own toggle, and the game re-sets `followEntity` itself when the map closes. The
+  full-screen check also moved ahead of the "camera off" path, which restored the follow target on
+  the way past and re-locked the map for anyone playing without the shared camera.
+
 ## [0.1.26] — 2026-10-25
 
 ### Fixed

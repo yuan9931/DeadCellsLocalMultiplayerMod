@@ -353,27 +353,30 @@ internal static class SharedCamera
         var hero2 = LocalCoop.Hero2;
         try
         {
-            if (!_driving || !Enabled || !LocalCoop.Enabled)
+            // Only the CORNER minimap is driven. The full-screen map (the one opened with the map
+            // key) is the same MiniMap object with isFullscreen set, and it must stay vanilla: it is
+            // a browse-the-whole-level screen the player pans and zooms themselves, so forcing our
+            // midpoint pan and a fixed 0.6 scale onto it fights the player's own navigation.
+            //
+            // <b>Do not touch followEntity here.</b> MiniMap.update() treats a non-null followEntity
+            // as "follow mode": the pan dispatch sits behind a follow-mode test, and with a follow
+            // target set the update re-centres on it and never reaches handleWorldMapMovements() —
+            // the player's pan input is silently dropped and the map looks frozen. Follow mode is
+            // the player's own toggle on this screen, so the only correct thing to do is leave the
+            // field exactly as the game set it and just run the game's own update. This check must
+            // come FIRST: restoring the follow target on the way past (the "camera off" path below)
+            // would re-lock the map for anyone playing without the shared camera.
+            if (self.isFullscreen)
             {
-                // Not driving: hand the minimap back to the game's own follow logic (player one).
-                // followEntity was nulled while we were driving, so restore it from the hero tracker
-                // before the game's update re-runs its ease toward the tracked hero.
-                if (self.followEntity == null)
-                {
-                    self.followEntity = self.heroTracker?.e;
-                }
-
                 orig(self);
                 return;
             }
 
-            // Only the CORNER minimap is driven. The full-screen map (the one opened with the map
-            // key) is the same MiniMap object with isFullscreen set, and it must stay vanilla: it is
-            // a browse-the-whole-level screen the player pans and zooms themselves, so forcing our
-            // midpoint pan and a fixed 0.6 scale onto it fights the player's own navigation. Hand it
-            // straight back to the game and restore the follow target we null while driving.
-            if (self.isFullscreen)
+            if (!_driving || !Enabled || !LocalCoop.Enabled)
             {
+                // Not driving: hand the corner map back to the game's own follow logic (player one).
+                // followEntity was nulled while we were driving, so restore it from the hero tracker
+                // before the game's update re-runs its ease toward the tracked hero.
                 if (self.followEntity == null)
                 {
                     self.followEntity = self.heroTracker?.e;
