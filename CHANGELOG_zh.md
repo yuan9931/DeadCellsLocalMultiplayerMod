@@ -4,6 +4,12 @@
 
 格式遵循 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)，本项目采用 `MAJOR.MINOR.PATCH` 版本方案，PATCH 位会随着每个用户可见的修复或功能递增。
 
+## [0.1.28] — 2026-10-27
+
+### 修复
+
+- **独立装备下 P2 可以正常使用重铸了。** 地下锻造界面（`dc.ui.ForgeUnderground`）的重铸列表整块来自 `Game.ME.hero.inventory`（`getEquippedWeaponOn` / `getBackpackWeapon` / `getActiveOn`），重铸后的道具也是通过同一个英雄的 `onEquipedItemsChange` 写回。mod 把全局英雄保持在 P1，于是 P2 打开锻造时列表里只有 P1 的装备——没有 P2 的东西可选，重铸改的也是 P1 的道具。现在从 `SmallBlacksmith.onActivate` 记录是谁打开的锻造，界面自身的工作（建列表、`reforge`、道具说明、validate、update）都在该英雄身份下运行。金币和细胞不需要特殊处理：金币存在 `Game.data.money`，而锻造只花金币，所以无论全局指向谁都从同一个钱包扣。
+
 ## [0.1.27] — 2026-10-27
 
 ### 修复

@@ -352,7 +352,7 @@ internal static partial class LocalCoop
         }
         catch (Exception ex)
         {
-            LogWarn("[LocalCoop] a mob-AI hook failed: {Message}", ex.Message);
+            LogWarn("[LocalCoop] a global-hero re-point hook failed: {Message}", ex.Message);
         }
         finally
         {

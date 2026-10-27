@@ -6,6 +6,20 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 project uses a `MAJOR.MINOR.PATCH` scheme where the PATCH digit moves for every
 user-visible fix or feature.
 
+## [0.1.28] — 2026-10-27
+
+### Fixed
+
+- **Player two can use the reforge again (independent equipment).** The underground forge
+  (`dc.ui.ForgeUnderground`) builds its whole reforge list from `Game.ME.hero.inventory`
+  (`getEquippedWeaponOn` / `getBackpackWeapon` / `getActiveOn`) and pushes a rerolled item back
+  through that same hero's `onEquipedItemsChange`. The mod keeps the global hero on player one, so
+  player two's forge listed player one's gear — nothing of player two's to pick, and a reroll would
+  have re-rolled the wrong hero's item. The hero that opened the forge is now recorded from
+  `SmallBlacksmith.onActivate` and the screen's own work (list build, `reforge`, item description,
+  validate, update) runs as that hero. Gold and cells need no special case: gold lives on
+  `Game.data.money` and the forge spends only gold, so the one shared purse pays either way.
+
 ## [0.1.27] — 2026-10-27
 
 ### Fixed

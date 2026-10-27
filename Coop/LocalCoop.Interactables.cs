@@ -113,6 +113,44 @@ internal static partial class LocalCoop
             RunAsHero(NearbyHeroFor(self, radiusPx: 60.0), () => orig(self));
         Hook_SmallBlacksmith.fixedUpdate += (orig, self) =>
             RunAsHero(NearbyHeroFor(self, radiusPx: 60.0), () => orig(self));
+
+        // The underground forge builds its weapon list from `Game.ME.hero.inventory` and mutates the
+        // item through that hero's `onEquipedItemsChange`. The mod keeps the global on player one, so
+        // with independent equipment player two's forge showed player one's gear and re-rolled it —
+        // there was nothing of player two's to pick, which reads as "the forge does not work".
+        // Remember who opened it and run the forge's own work as that hero. Money and cells stay
+        // shared on purpose: they are re-pointed onto player one, so the price is paid from the one
+        // purse either way and needs no special case here.
+        Hook_SmallBlacksmith.onActivate += (orig, self, by, lp) =>
+        {
+            RememberForgeHero(by);
+            orig(self, by, lp);
+        };
+        Hook_ForgeUnderground.initUndergroundForge += (orig, self) =>
+            RunAsHero(ForgeHero(), () => orig(self));
+        Hook_ForgeUnderground.reforge += (orig, self, item, bonusUpLevel) =>
+            RunAsHero(ForgeHero(), () => orig(self, item, bonusUpLevel));
+        Hook_ForgeUnderground.setItemDesc += (orig, self, item) =>
+            RunAsHero(ForgeHero(), () => orig(self, item));
+        // `select` is not hooked: it only moves the cursor and touches neither the global hero nor
+        // the bag, and its `Ref<bool> scroll` cannot be forwarded through a lambda anyway.
+        Hook_ForgeUnderground.onValidate += (orig, self) =>
+            RunAsHero(ForgeHero(), () => orig(self));
+        Hook_ForgeUnderground.update += (orig, self) =>
+            RunAsHero(ForgeHero(), () => orig(self));
+        Hook_ForgeUnderground.postUpdate += (orig, self) =>
+            RunAsHero(ForgeHero(), () => orig(self));
+        Hook_ForgeUnderground.onDispose += (orig, self) =>
+        {
+            try
+            {
+                orig(self);
+            }
+            finally
+            {
+                ForgetForgeHero();
+            }
+        };
         Hook_Knight.fixedUpdate += (orig, self) =>
             RunAsHero(NearbyHeroFor(self, radiusPx: 60.0), () => orig(self));
         Hook_Tailor.fixedUpdate += (orig, self) =>
@@ -177,6 +215,51 @@ internal static partial class LocalCoop
         }
 
         return ReferenceEquals(hero, _hero1) ? _hero2 : (ReferenceEquals(hero, _hero2) ? _hero1 : null);
+    }
+
+    /// <summary>
+    /// The hero that opened the underground forge, so the screen's own work can run as that hero.
+    /// <para>
+    /// <c>ForgeUnderground.initUndergroundForge</c> builds the reforge list from
+    /// <c>Game.ME.hero.inventory</c> (<c>getEquippedWeaponOn</c> / <c>getBackpackWeapon</c> /
+    /// <c>getActiveOn</c>) and <c>reforge</c> pushes the rerolled item through that same hero's
+    /// <c>onEquipedItemsChange</c>. The mod keeps the global on player one, so with independent
+    /// equipment player two's forge listed player one's gear — there was nothing of player two's to
+    /// pick, and a reroll would have re-rolled the wrong hero's item. The opener is recorded from
+    /// <c>SmallBlacksmith.onActivate</c>, which carries the activating hero (and, on the proximity
+    /// path, the hero the mod already re-pointed the global at), and every piece of the screen's work
+    /// runs as that hero.
+    /// </para>
+    /// <para>
+    /// Money and cells need no special case: gold lives on <c>Game.data.money</c>, shared by both
+    /// heroes, so the price is paid from the one purse whoever the global points at.
+    /// </para>
+    /// </summary>
+    private static Hero? _forgeHero;
+
+    private static void RememberForgeHero(Hero? by)
+    {
+        if (!Enabled)
+        {
+            return;
+        }
+
+        if (by != null && !by.destroyed && (ReferenceEquals(by, _hero1) || ReferenceEquals(by, _hero2)))
+        {
+            _forgeHero = by;
+        }
+    }
+
+    /// <summary>The recorded forge opener, or null when it is gone (the hooks then run unswapped).</summary>
+    private static Hero? ForgeHero()
+    {
+        var hero = _forgeHero;
+        return hero != null && !hero.destroyed ? hero : null;
+    }
+
+    private static void ForgetForgeHero()
+    {
+        _forgeHero = null;
     }
 
     /// <summary>
