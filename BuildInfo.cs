@@ -6,5 +6,5 @@ namespace DeadCellsLocalMultiplayerMod;
 /// </summary>
 internal static class BuildInfo
 {
-    public const string Version = "0.1.28";
+    public const string Version = "0.1.29";
 }

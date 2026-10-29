@@ -6,6 +6,42 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 project uses a `MAJOR.MINOR.PATCH` scheme where the PATCH digit moves for every
 user-visible fix or feature.
 
+## [0.1.29] — 2026-10-29
+
+### Fixed
+
+- **Player two's "replace this item" panel is now player two's panel (independent equipment).** The
+  three replace screens (`dc.ui.ReplaceItem`, `dc.ui.ReplaceSingleItem`, `dc.ui.ReplaceItemWithDual`)
+  read `Game.ME.hero.inventory` for everything they do — the item list, the
+  `canPutInBackpack(...)` check that decides whether the backpack choice is even offered, the
+  `getBackpackWeapon()` they hand to the nested single-item panel, and finally the drop of the
+  replaced item. The mod keeps the global hero on player one, so player two's panel described player
+  one's bag: it offered player one's backpack item, and when player one had no backpack the nested
+  panel was built with "nothing to replace" while player two's backpack was in fact occupied. The
+  stock then hit the game's own guard, which throws
+  `you can't stock Weapon … in full backpack` out of `Inventory.putInBackpack` — and an exception
+  escaping a hook is fatal, so the run ended right there. The panel now records the hero whose
+  `Hero.pickItem` constructed it, and both its per-frame work (`update` / `postUpdate`) and its
+  confirm (`onValidate`) run as that owner; a panel built from inside another panel inherits the same
+  owner. When the record is missing, the item being replaced still identifies its bag through
+  `Inventory.isEquiped`, with the old "last pickup" record as the last resort.
+- **A refused replacement costs the replacement, not the run.** The panel's confirm is wrapped: if the
+  game still raises a refusal halfway through, the panel is disposed (which restores the HUD and
+  releases the controller access it took) and the game is resumed instead of letting the exception
+  escape the hook.
+- **A leftover backpack occupant is dropped, never deleted.** As a final guard, `putInBackpack` now
+  clears an occupant that is still holding the slot when the incoming item has already been assigned
+  it, using the same drop the panel itself performs (`Hero.dropAndUpdateItem` plus a ground
+  `ItemDrop`). Only an item whose `posID` is the backpack's own id is touched, so an equipped weapon
+  can never be dropped by this. Previously an old backpack weapon could simply vanish instead of
+  landing at its owner's feet.
+
+### Added
+
+- A log line on every panel confirm naming the owner, the item being replaced and its slot id, the
+  current backpack occupant and the weapon/active counts — enough to tell, from the log alone, whether
+  a replacement dropped the wrong item or was refused.
+
 ## [0.1.28] — 2026-10-27
 
 ### Fixed
