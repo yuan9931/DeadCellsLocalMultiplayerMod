@@ -1,6 +1,7 @@
 using System;
 using dc;
 using dc.en;
+using dc.en.inter;
 using dc.pr;
 using dc.tool;
 using dc.ui;
@@ -51,6 +52,29 @@ internal static partial class LocalCoop
     private const long DropActorWindowMs = 120000;
 
     /// <summary>
+    /// The hero the replace panel that is currently open belongs to.
+    /// <para>
+    /// This is the panel's own owner, captured when the panel was <b>constructed</b> (which always
+    /// happens inside <c>Hero.pickItem</c>, so the picking hero is still known there), and it is what
+    /// the panel's <c>onValidate</c> must run as. The older "last pickup anywhere" record
+    /// (<see cref="_dropActor"/>) is only a fallback: it can have been overwritten by another pickup
+    /// or have aged out, and a panel that drops the replaced item from the <b>wrong hero's</b>
+    /// inventory leaves the real owner's bag untouched — which is exactly how the game then refuses
+    /// the replacement ("you can't stock Weapon … in full backpack") and takes the run down.
+    /// </para>
+    /// </summary>
+    private static Hero? _panelOwner;
+
+    /// <summary>
+    /// Set while a pickup is inside <c>Hero.pickItem</c>, i.e. while the panel it may open is being
+    /// constructed: the panel constructor hooks read it and store it as <see cref="_panelOwner"/>.
+    /// </summary>
+    private static Hero? _pendingPanelOwner;
+
+    /// <summary>The backpack slot id `Inventory.putInBackpack` itself writes (<c>i.posID = 2</c>).</summary>
+    private const int BackpackPosId = 2;
+
+    /// <summary>
     /// Registers the drop hooks: the pickup funnel that records the acting hero and the three replace
     /// panels that drop the replaced item. Called from <c>Install</c>.
     /// </summary>
@@ -64,6 +88,117 @@ internal static partial class LocalCoop
         Hook_ReplaceItem.onValidate += OnReplaceItemValidate;
         Hook_ReplaceSingleItem.onValidate += OnReplaceSingleItemValidate;
         Hook_ReplaceItemWithDual.onValidate += OnReplaceItemWithDualValidate;
+
+        // The panels' own constructors, which is the only place that ties a panel to the hero whose
+        // pickup opened it (see _panelOwner)...
+        Hook__ReplaceItem.__constructor__ += OnReplaceItemCtor;
+        Hook__ReplaceSingleItem.__constructor__ += OnReplaceSingleItemCtor;
+        Hook__ReplaceItemWithDual.__constructor__ += OnReplaceItemWithDualCtor;
+
+        // ...and their per-frame work, which reads the global hero just as much: while a multi-slot
+        // panel is up, `ReplaceItem.update()` builds its item list from `Game.ME.hero.inventory`,
+        // decides whether the backpack choice is offered with `hero.inventory.canPutInBackpack(...)`
+        // and, when the player picks the backpack, hands the nested single-item panel the item to
+        // replace — `Game.ME.hero.inventory.getBackpackWeapon()`. Left on the global (always player
+        // one) that produced a panel describing player one's bag: player two saw player one's
+        // backpack item offered, and when player one's backpack was empty the nested panel was built
+        // with "no item to replace" while player two's backpack was in fact occupied — the stock then
+        // hit the game's "full backpack" refusal and took the run down.
+        Hook_ReplaceItem.update += (orig, self) => RunAsPanelOwner(() => orig(self));
+        Hook_ReplaceItemWithDual.update += (orig, self) => RunAsPanelOwner(() => orig(self));
+        Hook_ReplaceSingleItem.update += (orig, self) => RunAsPanelOwner(() => orig(self));
+        Hook_ReplaceItem.postUpdate += (orig, self) => RunAsPanelOwner(() => orig(self));
+        Hook_ReplaceItemWithDual.postUpdate += (orig, self) => RunAsPanelOwner(() => orig(self));
+
+        // Last line of defence for the backpack stock itself (see OnInventoryPutInBackpack).
+        Hook_Inventory.putInBackpack += OnInventoryPutInBackpack;
+    }
+
+    /// <summary>
+    /// Runs a replace panel's per-frame work with the global hero on the panel's owner, so every
+    /// <c>Game.ME.hero.inventory</c> it reads is the right bag. This is a plain swap — unlike
+    /// <see cref="RunAsDropActor"/> it does not rebuild the HUD or consume the pickup record, because
+    /// it runs on every frame the panel is open.
+    /// </summary>
+    private static void RunAsPanelOwner(Action body)
+    {
+        var owner = Enabled ? PanelOwner() : null;
+        var game = owner?._level?.game;
+        if (owner == null || game == null || ReferenceEquals(game.hero, owner))
+        {
+            body();
+            return;
+        }
+
+        var previous = game.hero;
+        try
+        {
+            game.hero = owner;
+            body();
+        }
+        catch (Exception ex)
+        {
+            // A panel's own update must never be able to take the run down.
+            LogWarn("[LocalCoop] a replace panel's update failed: {Message}", ex.Message);
+        }
+        finally
+        {
+            game.hero = previous;
+        }
+    }
+
+    private static void OnReplaceItemCtor(
+        Hook__ReplaceItem.orig___constructor__ orig,
+        ReplaceItem self,
+        Entity source,
+        InventItem item,
+        HaxeProxy.Runtime.HlAction<bool> cb)
+    {
+        CapturePanelOwner();
+        orig(self, source, item, cb);
+    }
+
+    private static void OnReplaceSingleItemCtor(
+        Hook__ReplaceSingleItem.orig___constructor__ orig,
+        ReplaceSingleItem self,
+        Entity source,
+        InventItem newItem,
+        InventItem oldItem,
+        HaxeProxy.Runtime.HlAction<bool> cb,
+        HaxeProxy.Runtime.Ref<bool> isBackpack)
+    {
+        CapturePanelOwner();
+        orig(self, source, newItem, oldItem, cb, isBackpack);
+    }
+
+    private static void OnReplaceItemWithDualCtor(
+        Hook__ReplaceItemWithDual.orig___constructor__ orig,
+        ReplaceItemWithDual self,
+        Entity source,
+        InventItem firstItem,
+        InventItem secondItem,
+        HaxeProxy.Runtime.HlAction<bool> cb)
+    {
+        CapturePanelOwner();
+        orig(self, source, firstItem, secondItem, cb);
+    }
+
+    /// <summary>
+    /// Stores the picking hero as the owner of the panel being constructed.
+    /// <para>
+    /// A panel built while a pickup is in progress takes that pickup's hero. A panel built with no
+    /// pickup in flight is the nested single-item panel a multi-slot panel creates when the player
+    /// picks the backpack (it is built from inside that outer panel's <c>update</c>), so it inherits
+    /// the owner already recorded — the same player, one screen further in.
+    /// </para>
+    /// </summary>
+    private static void CapturePanelOwner()
+    {
+        var pending = _pendingPanelOwner;
+        if (pending != null && !pending.destroyed)
+        {
+            _panelOwner = pending;
+        }
     }
 
     /// <summary>
@@ -250,6 +385,10 @@ internal static partial class LocalCoop
 
         try
         {
+            // The panels this pickup may open are constructed inside `orig`, and their constructors
+            // read this to learn whose pickup they belong to.
+            _pendingPanelOwner = _panelOwner = null;
+            _pendingPanelOwner = self;
             orig(self, source, item, endCb);
         }
         catch (Exception ex)
@@ -260,6 +399,7 @@ internal static partial class LocalCoop
         }
         finally
         {
+            _pendingPanelOwner = null;
             if (switchedHero)
             {
                 try
@@ -360,24 +500,33 @@ internal static partial class LocalCoop
 
     /// <summary>
     /// Runs a replace panel's <c>onValidate()</c> with <c>game.hero</c> pointed at the hero that
-    /// started the pickup, so the replaced item is dropped at <b>that</b> hero's feet instead of at
-    /// player one's — the panels read <c>Game.ME.hero</c>, which is always player one here. The swap
-    /// is restored in a <c>finally</c>, so a failure inside the panel cannot leave the global hero
-    /// pointing at player two.
+    /// started the pickup, so the replaced item is dropped from <b>that</b> hero's bag and at its
+    /// feet — the panel itself drops through <c>Game.ME.hero</c>, which this mod keeps on player one.
+    /// The swap is restored in a <c>finally</c>, so a failure inside the panel cannot leave the global
+    /// hero pointing at player two.
     /// <para>
-    /// <b>Independent equipment is the exception, and it is what crashed the game.</b> The panel's
-    /// <c>onValidate()</c> runs a pickup, which ends in <c>HUD.initItems(hero)</c> — and that walks the
-    /// hero's inventory indexing the HUD's slot arrays by each item's <c>posID</c>, throwing
-    /// <c>unexpected posId</c> when the index is out of range. Player two's cloned inventory numbers
-    /// its items on its own, so pointing the global at player two for the panel made that rebuild
-    /// index player one's arrays out of range. With two backpacks the global therefore stays on player
-    /// one here; the drop position is the only thing that would have benefited from the swap, and a
-    /// crash is far worse than an item landing a cell or two off.
+    /// <b>The swap is what keeps the two halves of the panel consistent, and getting it wrong is what
+    /// crashed the game.</b> A panel drops the replaced item (through the global) and then runs the
+    /// pickup continuation (bound to the hero that opened it) — and the "full backpack" guard between
+    /// them reads the bag of the hero being stocked. If the drop misses the stocking hero's bag, the
+    /// replaced weapon is still there when the new one is stocked and the game throws
+    /// <c>you can't stock Weapon … in full backpack</c> out of <c>Inventory.putInBackpack</c>, which
+    /// was fatal here. The swap therefore has to happen, and it has to happen on the panel's own owner
+    /// rather than on a record of "the last pickup", which can be minutes stale by the time the player
+    /// confirms a panel — see <see cref="_panelOwner"/>.
+    /// </para>
+    /// <para>
+    /// The HUD rebuild below is only for the pickup the panel runs: it indexes the HUD's slot arrays
+    /// by each item's <c>posID</c>, and player two's bag numbers its items on its own. It is wrapped,
+    /// so an out-of-range id costs a log line rather than the run.
     /// </para>
     /// </summary>
-    private static void RunAsDropActor(Action body)
+    private static void RunAsDropActor(Action body, InventItem? itemHint = null)
     {
-        var actor = Enabled ? DropActor() : null;
+        // The panel's own owner wins: it was recorded when the panel was built, inside that hero's
+        // pickup, so it cannot be a stale "last pickup" record (see _panelOwner). When that record is
+        // missing, the item the panel is about to replace identifies its owner just as well.
+        var actor = Enabled ? (PanelOwner() ?? OwnerOfItem(itemHint) ?? DropActor()) : null;
         var game = actor?._level?.game ?? _hero1?._level?.game;
         if (actor == null || game == null)
         {
@@ -425,15 +574,271 @@ internal static partial class LocalCoop
     }
 
     private static void OnReplaceItemValidate(Hook_ReplaceItem.orig_onValidate orig, ReplaceItem self)
-        => RunAsDropActor(() => orig(self));
+        => RunPanelValidate(() => orig(self), self);
 
     private static void OnReplaceSingleItemValidate(
         Hook_ReplaceSingleItem.orig_onValidate orig,
         ReplaceSingleItem self)
-        => RunAsDropActor(() => orig(self));
+        => RunPanelValidate(() => orig(self), self, self.oldItem);
 
     private static void OnReplaceItemWithDualValidate(
         Hook_ReplaceItemWithDual.orig_onValidate orig,
         ReplaceItemWithDual self)
-        => RunAsDropActor(() => orig(self));
+        => RunPanelValidate(() => orig(self), self);
+
+    /// <summary>
+    /// Runs a replace panel's confirm as the hero that opened it, and never lets it take the run down.
+    /// <para>
+    /// The panel's <c>onValidate</c> both drops the replaced item and runs the pickup that stocks the
+    /// new one, so a game-side refusal raised in the middle of it (the "you can't stock … in full
+    /// backpack" error, which the game throws instead of handling) used to escape this hook — and an
+    /// exception thrown inside a hook is fatal to the game. That is precisely what a player-two
+    /// backpack replacement hit. The panel is closed and the game resumed instead, so the worst case
+    /// is a replacement that did not happen rather than a lost run.
+    /// </para>
+    /// </summary>
+    private static void RunPanelValidate(Action body, dc.libs.Process panel, InventItem? itemHint = null)
+    {
+        LogPanelState(itemHint);
+        try
+        {
+            RunAsDropActor(body, itemHint);
+        }
+        catch (Exception ex)
+        {
+            LogWarn("[LocalCoop] the replace panel's confirm failed; closing it to keep the run alive: {Message}",
+                ex.Message);
+            ClosePanelAfterFailure(panel);
+        }
+    }
+
+    /// <summary>
+    /// Logs what a replace panel is about to do: whose bag it belongs to, the item it replaces and
+    /// the item it stocks, with both ids and the state of the backpack slot. A replacement that goes
+    /// wrong (an item that vanishes instead of dropping, a stock the game refuses) is decided here,
+    /// and this line is what says which of those happened.
+    /// </summary>
+    private static void LogPanelState(InventItem? oldItem)
+    {
+        if (!Logging)
+        {
+            return;
+        }
+
+        try
+        {
+            var owner = PanelOwner() ?? OwnerOfItem(oldItem) ?? DropActor();
+            var bag = owner?.inventory;
+            var occupant = bag?.getBackpackWeapon();
+            Log($"[LocalCoop][drop] panel confirm: owner={HeroName(owner)}, "
+                + $"old={ItemName(oldItem)}@{oldItem?.posID ?? -1}, "
+                + $"backpack={(bag?.hasWeaponInBackpack() == true ? ItemName(occupant) : "-")}, "
+                + $"nbW={bag?.nbWeapons ?? -1}, nbA={bag?.nbActives ?? -1}");
+        }
+        catch (Exception ex)
+        {
+            LogWarn("[LocalCoop] could not describe the replace panel: {Message}", ex.Message);
+        }
+    }
+
+    /// <summary>
+    /// Best-effort undo of the modal state a replace panel leaves behind when its confirm threw: the
+    /// panel is opened with <c>modalPause</c> and a hidden HUD, and its own tail (which would resume
+    /// the game and restore the HUD) never ran because the exception escaped <c>onValidate</c>.
+    /// </summary>
+    private static void ClosePanelAfterFailure(dc.libs.Process panel)
+    {
+        // Dispose the panel first: its own onDispose releases the controller access it took and shows
+        // the HUD again (it was hidden by the panel's constructor, together with the modal pause).
+        try
+        {
+            panel.disposeImmediately();
+        }
+        catch (Exception ex)
+        {
+            LogWarn("[LocalCoop] could not dispose the failed replace panel: {Message}", ex.Message);
+            try
+            {
+                panel.destroyed = true;
+            }
+            catch (Exception ex2)
+            {
+                LogWarn("[LocalCoop] could not close the failed replace panel: {Message}", ex2.Message);
+            }
+        }
+
+        try
+        {
+            Game.Class.ME?.resume();
+        }
+        catch (Exception ex)
+        {
+            LogWarn("[LocalCoop] could not resume the game after the replace panel failed: {Message}", ex.Message);
+        }
+
+        _panelOwner = null;
+    }
+
+    /// <summary>
+    /// The hero a replace panel is currently owned by, if it is still one of ours and alive.
+    /// </summary>
+    private static Hero? PanelOwner()
+    {
+        var owner = _panelOwner;
+        if (owner == null || owner.destroyed
+            || (!ReferenceEquals(owner, _hero1) && !ReferenceEquals(owner, _hero2)))
+        {
+            _panelOwner = null;
+            return null;
+        }
+
+        return owner;
+    }
+
+    /// <summary>
+    /// The hero whose bag holds <paramref name="item"/>, or null when neither does.
+    /// <para>
+    /// <c>Inventory.isEquiped</c> is the game's own identity test (it compares the item against the
+    /// equipped weapons, the backpack and the actives), so this does not depend on comparing Haxe
+    /// proxies from C#. With shared equipment both heroes hold the same bag and player one answers
+    /// first, which is the right owner for a shared purse.
+    /// </para>
+    /// </summary>
+    private static Hero? OwnerOfItem(InventItem? item)
+    {
+        if (!Enabled || item == null)
+        {
+            return null;
+        }
+
+        foreach (var hero in new[] { _hero1, _hero2 })
+        {
+            if (hero == null || hero.destroyed)
+            {
+                continue;
+            }
+
+            try
+            {
+                if (hero.inventory?.isEquiped(item) == true)
+                {
+                    return hero;
+                }
+            }
+            catch (Exception ex)
+            {
+                LogWarn("[LocalCoop] could not ask a bag about the replaced item: {Message}", ex.Message);
+            }
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// Keeps the backpack stock from turning into a fatal error, without ever destroying an item.
+    /// <para>
+    /// <c>Inventory.putInBackpack</c> refuses outright whenever the backpack slot is still occupied —
+    /// every branch of its guard throws — and it is only reached when the incoming item has already
+    /// been assigned the backpack slot (<c>posID == 2</c>), i.e. by the replace flow the player
+    /// already confirmed. If the replaced weapon is still in the bag at that moment (the panel's own
+    /// drop ran somewhere else, or the slot holds a leftover), the occupant is <b>dropped on the
+    /// ground</b> the way the replace panel itself drops a replaced item — never just deleted, which
+    /// is what made player two's old backpack weapon vanish instead of landing at its feet.
+    /// </para>
+    /// <para>
+    /// Only an occupant whose <c>posID</c> is the backpack's own id is touched, so an equipped weapon
+    /// can never be dropped by this.
+    /// </para>
+    /// </summary>
+    private static InventItem OnInventoryPutInBackpack(
+        Hook_Inventory.orig_putInBackpack orig,
+        Inventory self,
+        InventItem item)
+    {
+        try
+        {
+            if (Enabled && item != null && item.posID == BackpackPosId && self.hasWeaponInBackpack())
+            {
+                var occupant = self.getBackpackWeapon();
+                if (occupant != null && !ReferenceEquals(occupant, item) && occupant.posID == BackpackPosId)
+                {
+                    Log($"[LocalCoop][drop] the backpack still held {ItemName(occupant)}; dropping it so "
+                        + $"{ItemName(item)} could take the slot");
+                    DropOccupant(self, occupant);
+                }
+                else if (occupant != null && !ReferenceEquals(occupant, item))
+                {
+                    LogWarn("[LocalCoop] the backpack guard is reading slot {Slot} (an equipped weapon), "
+                        + "not the backpack slot; the stock may still fail", self.nbWeapons);
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            LogWarn("[LocalCoop] could not clear the backpack occupant: {Message}", ex.Message);
+        }
+
+        return orig(self, item);
+    }
+
+    /// <summary>
+    /// Takes a leftover backpack occupant out of its bag and puts it on the ground, mirroring the
+    /// replace panel's own drop (<c>Hero.dropAndUpdateItem</c> + a ground <see cref="ItemDrop"/>) so
+    /// the managers / HUD follow and the player keeps the item.
+    /// </summary>
+    private static void DropOccupant(Inventory bag, InventItem occupant)
+    {
+        var hero = HeroOf(bag);
+        if (hero == null || hero._level == null)
+        {
+            // No hero to drop for: at least take it out of the bag, which is what the game's own
+            // remove does (it clears the id too, so the stock can proceed).
+            bag.remove(occupant);
+            return;
+        }
+
+        var dropped = hero.dropAndUpdateItem(occupant);
+        if (dropped == null)
+        {
+            return;
+        }
+
+        var inArmory = HaxeProxy.Runtime.Ref<bool>.DontCare;
+        new ItemDrop(hero._level, hero.cx, hero.cy, dropped, false, inArmory).init();
+    }
+
+    /// <summary>The hero whose bag this is, or null when it belongs to neither of ours.</summary>
+    private static Hero? HeroOf(Inventory bag)
+    {
+        foreach (var hero in new[] { _hero1, _hero2 })
+        {
+            if (hero != null && !hero.destroyed && ReferenceEquals(hero.inventory, bag))
+            {
+                return hero;
+            }
+        }
+
+        return null;
+    }
+
+    /// <summary>An item's display name for the log, never throwing.</summary>
+    private static string ItemName(InventItem? item)
+    {
+        if (item == null)
+        {
+            return "-";
+        }
+
+        try
+        {
+            var neutral = false;
+            var name = item.getOnlyName(ref neutral);
+            var text = name?.ToString();
+            return string.IsNullOrWhiteSpace(text) ? "?" : text;
+        }
+        catch
+        {
+            return "?";
+        }
+    }
 }
