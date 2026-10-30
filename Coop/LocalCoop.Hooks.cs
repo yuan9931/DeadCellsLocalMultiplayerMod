@@ -173,6 +173,26 @@ internal static partial class LocalCoop
                 var other = ReferenceEquals(self, _hero1) ? _hero2 : _hero1;
                 if (IsAlive(other))
                 {
+                    // The game's OWN "survive a lethal hit" answers first. Everything a player brings
+                    // for exactly this moment lives in the vanilla gate: the YOLO mutation
+                    // (`tryToApplyYoloPerk`, the `P_Yolo` perk), the one-hit protection,
+                    // `P_DamnedVigor`, `P_Disengage`, the EvilSword, the Queen's mercy. Answering the
+                    // hit here before that gate ever ran is what made them silently do nothing for
+                    // the hero that still had a living teammate: player one took the hit, went down
+                    // and the mutation was left unspent — while player two, who died last (no living
+                    // teammate, so this branch was skipped and `orig` ran), was saved by the very
+                    // same mutation. Honouring `orig` first means a mutation willing to pay for the
+                    // hit pays it, and only a hit the game itself refuses to prevent becomes a down.
+                    //
+                    // Safe to call: `tryToPreventDeath` is a question, not the death flow. A `false`
+                    // answer leaves nothing running — the sequence only starts once the caller sees
+                    // no prevention, and we answer `true` below, so it never does.
+                    if (orig(self, a, prevLife))
+                    {
+                        Log($"[LocalCoop] {HeroName(self)} was saved by the game's own death prevention");
+                        return true;
+                    }
+
                     try
                     {
                         // Hold the hero at DownedLife (1), never at 0. A downed hero stays in the level,

@@ -6,6 +6,38 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 project uses a `MAJOR.MINOR.PATCH` scheme where the PATCH digit moves for every
 user-visible fix or feature.
 
+## [0.1.30] — 2026-10-30
+
+### Fixed
+
+- **Independent health: a lethal hit now lets the game's own death prevention answer first.** The
+  mod's down state answered every lethal hit on a hero whose teammate was still alive before the
+  vanilla gate (`Hero.tryToPreventDeath`) ever ran, which silently spent nothing: the YOLO mutation
+  (`tryToApplyYoloPerk`, the `P_Yolo` perk), the one-hit protection, `P_DamnedVigor`, `P_Disengage`,
+  the EvilSword and the Queen's mercy all live in that gate. The first hero to fall therefore went
+  down with its mutation untouched, while the last one — whose teammate was already down, so the
+  mod's branch was skipped — was saved by the very same mutation. The down gate now asks `orig`
+  first: a prevention the game is willing to pay for is honoured (the hero really survives), and
+  only a hit the game itself refuses to prevent becomes a down. A cursed hero is unaffected: the
+  vanilla gate refuses that hit, so it still goes down and spends the curse.
+- **Player two's item replacement works with independent equipment.** The replace panels
+  (`dc.ui.ReplaceItem` / `ReplaceItemWithDual` / `ReplaceSingleItem`) read the hero through the
+  **global** — `ReplaceItem.update()` builds its item list from `Game.ME.hero.inventory`, decides
+  whether to offer the backpack with `hero.inventory.canPutInBackpack(...)`, and hands the nested
+  single-item panel `Game.ME.hero.inventory.getBackpackWeapon()`. With the global held on player
+  one, player two was offered *player one's* backpack item; when player one's backpack was empty the
+  nested panel was built with "no item to replace" while player two's backpack was in fact
+  occupied, and the stock then hit the game's "you can't stock Weapon … in full backpack" refusal —
+  a Haxe exception thrown out of the mod's hook, which takes the whole run down. The hero whose
+  pickup opened a panel is now recorded at construction and both the panel's per-frame work and its
+  confirm run as that hero, so the screen describes the right bag.
+- **Replacing a backpack item no longer destroys it.** The safety net that keeps the game's
+  full-backpack refusal from becoming a fatal error took the leftover occupant out of the bag
+  without dropping it, so player two's old backpack weapon vanished when it replaced a *different*
+  item. It is dropped on the ground the way the replace panel itself drops a replaced item
+  (`Hero.dropAndUpdateItem` + a ground `ItemDrop`). The confirm also can no longer take the run
+  down: a game-side refusal closes the panel and resumes the game instead.
+  
 ## [0.1.29] — 2026-10-29
 
 ### Fixed

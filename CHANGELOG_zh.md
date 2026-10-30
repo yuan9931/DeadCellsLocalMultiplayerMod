@@ -4,6 +4,14 @@
 
 格式遵循 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)，本项目采用 `MAJOR.MINOR.PATCH` 版本方案，PATCH 位会随着每个用户可见的修复或功能递增。
 
+## [0.1.30] — 2026-10-30
+
+### 修复
+
+- **独立血量下，致命一击现在先让游戏自己的免死机制回答。** 队友存活时，mod 的倒地分支抢在原版闸门（`Hero.tryToPreventDeath`）之前就吞掉了每一击，而 YOLO 变异（`tryToApplyYoloPerk`，`P_Yolo` 变异）、一击保护、`P_DamnedVigor`、`P_Disengage`、邪恶之剑、女王的怜悯全都写在那个闸门里——于是先倒下的那名英雄带着没花掉的变异直接倒地，而后倒下的那名英雄（队友已倒地，mod 的分支被跳过）反倒被同一个变异救了下来。现在倒地闸门先问 `orig`：游戏愿意为这一击买单的免死就照实兑现（英雄真的活下来），只有游戏自己拒绝防止的一击才转成倒地。被诅咒的英雄不受影响：原版闸门拒绝该击，仍然倒地并消耗诅咒。
+- **独立装备下 P2 的替换装备界面正常了。** 替换界面（`dc.ui.ReplaceItem` / `ReplaceItemWithDual` / `ReplaceSingleItem`）都通过**全局英雄**读状态——`ReplaceItem.update()` 用 `Game.ME.hero.inventory` 建物品列表、用 `hero.inventory.canPutInBackpack(...)` 决定是否提供背包选项、并把 `Game.ME.hero.inventory.getBackpackWeapon()` 交给内嵌的单件面板。全局一直停在 P1，于是 P2 看到的是 **P1 的背包装备**；当 P1 背包为空时，内嵌面板被建成"没有可替换的物品"，而 P2 的背包其实是满的，装包随即撞上游戏自己的「you can't stock Weapon … in full backpack」拒绝——一个从 mod 钩子里抛出的 Haxe 异常，直接把整局带崩。现在在面板构造时记录是谁的拾取打开了它，面板的每帧工作与确认都在该英雄身份下运行，界面描述的正是本人的背包。
+- **替换背包装备不再把它弄丢。** 那个防止「背包已满」拒绝变成致命错误的保险，之前把占位者从背包里移除却没有丢下，于是 P2 替换**另一件**装备时，背包里原本那件会凭空消失。现在改成照替换面板自己的做法丢到地上（`Hero.dropAndUpdateItem` + 地面 `ItemDrop`）。确认动作也不再能让整局崩掉：游戏侧拒绝时会关掉面板并恢复游戏。
+
 ## [0.1.29] — 2026-10-29
 
 ### 修复
