@@ -413,10 +413,10 @@ internal static partial class LocalCoop
         // player one's (see OnHudSetHealings).
         Hook_HUD.setHealings += OnHudSetHealings;
 
-        // Player two's own HUD widgets (Coop/LocalCoop.P2HudClone.cs): a second Flow with its own
-        // life bar, tier bar, flask and weapon/skill slots. The hooks below feed it from the game's
-        // own write paths — the slot build, the per-slot closure binding and the ammo/fade
-        // repaints — so player two's gear and life stop landing on player one's HUD at all.
+        // Player two's own HUD widgets (Coop/LocalCoop.P2HudMerge.cs): its life bar, tier bar,
+        // flask and weapon/skill slots merged into the vanilla column. The hooks below feed them
+        // from the game's own write paths — the slot build, the per-slot closure binding and the
+        // ammo/fade repaints — so player two's gear and life stop landing on player one's HUD at all.
         InstallP2HudCloneHooks();
 
         // Pause / inventory windows (Coop/LocalCoop.InventoryWindow.cs + LocalCoop.InventoryPicker.cs):

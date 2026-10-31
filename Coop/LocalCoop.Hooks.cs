@@ -603,7 +603,7 @@ internal static partial class LocalCoop
     /// over two different values).
     /// <para>
     /// Player two's write is therefore redirected instead of dropped: it goes to the clone's own
-    /// bar (see <c>Coop/LocalCoop.P2HudClone.cs</c>), which is the same widget class fed the same
+    /// bar (see <c>Coop/LocalCoop.P2HudMerge.cs</c>), which is the same widget class fed the same
     /// values, so player two gets the vanilla fill, the delayed recover segment and the heal /
     /// damage feedback. When the clone is not up (shared health — nothing to show — or the clone
     /// latched its error flag) the write is simply skipped, exactly as before.

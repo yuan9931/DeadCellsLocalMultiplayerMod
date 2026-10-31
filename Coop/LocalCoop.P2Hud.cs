@@ -139,10 +139,10 @@ internal static partial class LocalCoop
                 ResetHeroPanels();
             }
 
-            // Player two's own HUD widgets (Coop/LocalCoop.P2HudClone.cs): a second Flow with a
-            // real life bar, tier bar, flask and weapon/skill slots, fed by the game's own write
-            // paths. In this mode only the life bar can be wanted (the bag is shared, so the
-            // vanilla slots already describe both heroes' gear).
+            // Player two's own HUD widgets (Coop/LocalCoop.P2HudMerge.cs): a real life bar, tier
+            // bar, flask and weapon/skill slots merged into the vanilla column, fed by the game's
+            // own write paths. In this mode only the life bar can be wanted (the bag is shared, so
+            // the vanilla slots already describe both heroes' gear).
             UpdateP2HudClone(dt);
 
             // …with one exception: with INDEPENDENT health the vanilla life bar describes only the

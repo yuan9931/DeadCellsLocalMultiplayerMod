@@ -550,9 +550,10 @@ function buildMainRooms() {
 
 ## 7. 与本仓库（DeadCellsLocalMultiplayerMod）相关的提醒
 
-- 工作区 `AGENTS.md` 写"读 `E:\Programs\Github\deadcells\decompiled`"，该路径已不存在；
-  反编译源码实际在 **`C:\Games\Github\decompiled\src`**（v35 CDB 在
-  `dccm/core/mdk/databases/v35/data.cdb`）。
+- 反编译游戏源码在 **`C:\Games\Github\decompiled\src`**（`AGENTS.md` 已改为指向该路径；
+  旧的 `E:\Programs\Github\deadcells\decompiled` 不再存在），v35 CDB 在
+  `dccm/core/mdk/databases/v35/data.cdb`。本文档中的相对链接（`../../decompiled/src/...`）
+  以仓库根为基准，因此指向仓库外的同级目录。
 - 与本仓库既有约定一致：**不要在 C# 里 `new ArrayObj()` 再 `push()`**
   （会在 `ArrayObj.push` 里 `0xC0000005`）。要构造子集用 `slice`/`filter` 等 Haxe 侧操作。
 - hook 体内一律 try/catch + 记日志：hook 里抛异常会带崩游戏。
