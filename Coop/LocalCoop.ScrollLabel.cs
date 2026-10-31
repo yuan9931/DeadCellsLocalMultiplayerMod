@@ -1,3 +1,4 @@
+using System.Runtime.CompilerServices;
 using dc.ui;
 using dc.ui.hud;
 using dc.h2d;
@@ -19,6 +20,16 @@ namespace DeadCellsLocalMultiplayerMod;
 /// It is drawn on the promotion screen's own root object and marked absolute, so it sits over the
 /// window instead of joining any layout, and it is removed when the screen goes away.
 /// </para>
+/// <para>
+/// <b>One label per screen, not one label per mod.</b> The chain keeps two screens alive for a
+/// moment: the first one validates, the second is constructed from inside that <c>validate</c>, and
+/// the first only disposes a tween later. A single <c>(label, owner)</c> pair therefore could not
+/// say "this screen already has a label" — whichever screen ticked last stole the slot, and the next
+/// pass on the other screen built a <i>second</i> line on top of the first (or lost the tracking and
+/// left a stale one behind). That is exactly the "sometimes the label is wrong / doubled / missing"
+/// symptom. Keying the label on its own screen fixes it by construction, and the weak table means a
+/// screen that dies without its dispose hook reaching us cannot leak the line.
+/// </para>
 /// </summary>
 internal static partial class LocalCoop
 {
@@ -28,14 +39,15 @@ internal static partial class LocalCoop
     /// <summary>Player two's label, tinted so the two passes are told apart at a glance.</summary>
     private const int ScrollLabelColorP2 = 0x9BD7FF;
 
-    /// <summary>The label currently shown, so it can be removed when its screen goes away.</summary>
-    private static dc.ui.Text? _scrollLabel;
-
-    /// <summary>The screen the label belongs to. A label for a screen that is gone is dropped.</summary>
-    private static TierSelect? _scrollLabelOwner;
+    /// <summary>
+    /// The label each promotion screen carries, keyed on the screen itself. A screen that already has
+    /// an entry is labelled and is never labelled twice; the weak key means a screen the game tears
+    /// down without our dispose hook cannot keep the line alive.
+    /// </summary>
+    private static readonly ConditionalWeakTable<TierSelect, dc.ui.Text> _scrollLabels = new();
 
     /// <summary>
-    /// Shows the "whose turn" label on the given promotion screen.
+    /// Shows the "whose turn" label on the given promotion screen, once.
     /// </summary>
     /// <param name="screen">The screen that just opened.</param>
     /// <param name="playerTwo">True for player two's pass, false for player one's.</param>
@@ -43,18 +55,17 @@ internal static partial class LocalCoop
     {
         // Called every frame while the screen is open, so an already-labelled screen is a no-op
         // instead of a pile of duplicate lines.
-        if (_scrollLabelOwner == screen)
+        if (_scrollLabels.TryGetValue(screen, out _))
         {
             return;
         }
 
         try
         {
-            // Only one promotion screen is ever open at a time, so the previous label (if any) is
-            // already gone with its screen.
             var root = screen.root;
             if (root == null)
             {
+                // Not laid out yet: the next frame retries, and nothing was recorded as done.
                 return;
             }
 
@@ -75,8 +86,7 @@ internal static partial class LocalCoop
 
             text.onResize();
 
-            _scrollLabel = text;
-            _scrollLabelOwner = screen;
+            _scrollLabels.Add(screen, text);
         }
         catch (Exception ex)
         {
@@ -85,29 +95,52 @@ internal static partial class LocalCoop
         }
     }
 
-    /// <summary>Removes the label, if its screen is the one that is going away.</summary>
+    /// <summary>Removes the label belonging to the screen that is going away.</summary>
     private static void DetachScrollLabel(TierSelect screen)
     {
-        if (_scrollLabelOwner == null || !ReferenceEquals(_scrollLabelOwner, screen))
+        if (!_scrollLabels.TryGetValue(screen, out var text))
         {
             return;
         }
 
-        ForgetScrollLabel();
+        _scrollLabels.Remove(screen);
+        RemoveScrollLabel(text);
     }
 
-    /// <summary>Removes the label outright (new run, level change).</summary>
+    /// <summary>Removes every label outright (new run, level change).</summary>
     private static void ForgetScrollLabel()
     {
-        var text = _scrollLabel;
-        _scrollLabel = null;
-        _scrollLabelOwner = null;
+        // Collect first: removing entries while enumerating a ConditionalWeakTable is not supported.
+        // No `Count` guard — the table exposes Count only as a LINQ extension, and the enumeration
+        // below is already the cheap path when it is empty.
+        List<dc.ui.Text>? doomed = null;
+        List<TierSelect>? screens = null;
 
-        if (text == null)
+        foreach (var pair in _scrollLabels)
+        {
+            (doomed ??= []).Add(pair.Value);
+            (screens ??= []).Add(pair.Key);
+        }
+
+        if (doomed == null || screens == null)
         {
             return;
         }
 
+        foreach (var text in doomed)
+        {
+            RemoveScrollLabel(text);
+        }
+
+        // The keys go with the labels; a screen still on screen would simply be relabelled.
+        foreach (var screen in screens)
+        {
+            _scrollLabels.Remove(screen);
+        }
+    }
+
+    private static void RemoveScrollLabel(dc.ui.Text text)
+    {
         try
         {
             text.parent?.removeChild(text);

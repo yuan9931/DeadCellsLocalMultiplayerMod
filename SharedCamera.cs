@@ -78,10 +78,26 @@ internal static class SharedCamera
     private static double _sepCellX;
     private static double _sepCellY;
 
-    // Room ids whose fog this mod already punched on the current level (see RevealFogFor). The fog is
-    // a texture with no "is this rect clear" query, so the only way to keep the texture writes rare is
-    // to remember which rooms we lit. Cleared per level/run by ForgetRevealedRooms below.
+    // Room ids whose fog this mod already punched (see RevealFogFor). The fog is a texture with no
+    // "is this rect clear" query, so the only way to keep the texture writes rare is to remember which
+    // rooms we lit.
     private static readonly HashSet<int> _fogRevealed = new();
+
+    /// <summary>
+    /// The level map <see cref="_fogRevealed"/> describes, or null when nothing is remembered.
+    /// <para>
+    /// <b>This is what makes the set per-level, and it is not optional.</b> <c>Room.id</c> is a
+    /// per-level index (<c>MapBuilder</c> numbers the rooms it builds from 0 on every level), so the
+    /// ids collide across levels: room 0 of the level just left would make room 0 of the new level
+    /// look "already revealed" and its fog would stay on for the whole level. Clearing the set only
+    /// from <c>ResetRunState</c> does not cover that, because a level transition goes through
+    /// <c>Game.initHero</c> → <c>PrepareHeroes</c> and never reaches <c>ResetRunState</c> — which is
+    /// exactly the "a new level starts fully fogged" bug. The map reference is the honest key: a new
+    /// level builds a new <c>LevelMap</c> (and a new <c>MapFow</c> texture), so comparing it catches
+    /// every transition, however it was reached.
+    /// </para>
+    /// </summary>
+    private static dc.level.LevelMap? _fogRevealedMap;
 
     /// <summary>
     /// Forgets which rooms' fog was already punched, so a new level/run starts fully fogged and the
@@ -90,6 +106,7 @@ internal static class SharedCamera
     internal static void ForgetRevealedRooms()
     {
         _fogRevealed.Clear();
+        _fogRevealedMap = null;
     }
 
     internal static void Install()
@@ -468,6 +485,17 @@ internal static class SharedCamera
         if (map == null || self.fow == null)
         {
             return;
+        }
+
+        // A different map means a different level: its fow texture is brand new and its room ids
+        // restart at 0, so the remembered ids describe a level that no longer exists. Reset here
+        // rather than relying on ResetRunState, which a level transition never reaches (see
+        // _fogRevealedMap).
+        if (!ReferenceEquals(map, _fogRevealedMap))
+        {
+            _fogRevealed.Clear();
+            _fogRevealedMap = map;
+            LogVerbose($"[SharedCamera] minimap fog tracking reset for the new level (map {map.wid}x{map.hei})");
         }
 
         // Two explicit calls rather than `foreach (var hero in new[] { hero1, hero2 })`: that array
