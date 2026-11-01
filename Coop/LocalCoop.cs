@@ -381,6 +381,8 @@ internal static partial class LocalCoop
         InstallEntityHooks();
         InstallWalkPush();
         InstallDropHooks();
+        // Keys stay party-wide even while the bags are independent (Coop/LocalCoop.Keys.cs).
+        InstallKeySharingHooks();
         Hook_Hero.kill += OnHeroKill;
         // One hero on a teleporter pad drags the partner along (restored by request).
         Hook_Hero.onTeleportation += OnHeroTeleportation;
