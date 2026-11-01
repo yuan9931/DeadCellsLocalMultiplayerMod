@@ -322,6 +322,9 @@ internal static partial class LocalCoop
                 LogWarn("[LocalCoop] pause ring slot refused an item: {Message}", ex.Message);
             }
 
+            // The three scroll counters at the bottom left of the screen.
+            ApplyPauseTierBar(pause, hero);
+
             // (The mutation bar is deliberately not rebuilt here. It has to be rebuilt in the layout
             // pass - OnPausePostUpdate - because the game redraws it every frame from the global hero,
             // so a one-shot rebuild here would be immediately replaced. Clearing the guard in
@@ -330,6 +333,51 @@ internal static partial class LocalCoop
         catch (Exception ex)
         {
             LogWarn("[LocalCoop] could not re-point the pause window's items: {Message}", ex.Message);
+        }
+    }
+
+    /// <summary>
+    /// Re-points the pause screen's three scroll counters (the <c>B</c>/<c>T</c>/<c>S</c> numbers at
+    /// the bottom left) at <paramref name="hero"/>.
+    /// <para>
+    /// <b>This is a separate write from the item descriptions, and it was the one missing piece.</b>
+    /// <c>DefaultPause</c>'s constructor builds a <c>TierBar</c> and seeds its three
+    /// <c>Tier.setValue(...)</c> calls from <c>Game.ME.hero.brutalityTier</c> / <c>tacticTier</c> /
+    /// <c>survivalTier</c> (<c>_DefaultPause.__inst_construct__</c>, right before
+    /// <c>botMenu.addChild(tierBar)</c>) — and then never writes them again: the pause screen has no
+    /// per-frame tier refresh anywhere in it. So with the global swapped the counters still showed
+    /// whatever they were seeded with, i.e. player one's, which is exactly "the scroll count at the
+    /// bottom left does not follow the switch".
+    /// </para>
+    /// <para>
+    /// <c>setValue(v, animated)</c> is the game's own writer: it sets the number, calls
+    /// <c>updateText()</c> and then optionally runs the little scale pop. The number is written
+    /// unconditionally, so the switch is correct either way; only the pop differs. Note the
+    /// parameter is a <c>bool?</c> whose implementation opens with
+    /// <c>if ((int)animated == 0) animated = true;</c> — i.e. the "no animation" value is not a
+    /// plain <c>false</c>, so the pop may still play. That is cosmetic and deliberately left to the
+    /// game rather than guessed at here.
+    /// </para>
+    /// </summary>
+    private static void ApplyPauseTierBar(DefaultPause pause, Hero hero)
+    {
+        var bar = pause.tierBar;
+        if (bar == null)
+        {
+            return;
+        }
+
+        try
+        {
+            bar.brutalityTier?.setValue(hero.brutalityTier, false);
+            bar.tacticTier?.setValue(hero.tacticTier, false);
+            bar.survivalTier?.setValue(hero.survivalTier, false);
+            LogVerbose($"[LocalCoop] pause tier bar -> B{hero.brutalityTier} " +
+                $"T{hero.tacticTier} S{hero.survivalTier}");
+        }
+        catch (Exception ex)
+        {
+            LogWarn("[LocalCoop] could not re-point the pause scroll counters: {Message}", ex.Message);
         }
     }
 
