@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using dc.en;
-using dc.pr;
 using dc.tool;
 using ModCore.Utilities;
 

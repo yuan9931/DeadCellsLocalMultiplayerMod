@@ -6,6 +6,42 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 project uses a `MAJOR.MINOR.PATCH` scheme where the PATCH digit moves for every
 user-visible fix or feature.
 
+## [0.1.31] — 2026-11-02
+
+### Added
+
+- **Keys are shared between the two heroes.** With independent equipment every key gate in the game
+  asked a single bag — `LockedDoorButton.hasKey` and `CemeteryGraveCave.hasKey` read
+  `_level.game.hero.inventory`, and the spend is a global-hero `removeOne(keyKind)` — so a key held by
+  the other hero was invisible at the door. Now a key the game puts into either hero's bag is mirrored
+  into the other's (through the game's own `Inventory.add`, as a fresh item of the same kind id), and
+  every spend takes it from both bags: `removeOne` for a keyhole door or the cavern, `removeAll` for
+  the Shrine keys, which the game spends that way. The HUD key bar — rebuilt from the *global* hero's
+  bag in three places, one of them a callback no mod can hook — simply draws the mirrored key, so both
+  players see it. Only ids the game itself tags `"Key"` are mirrored; mutations and aspects stay
+  per-hero, as independent equipment means. With shared equipment both heroes carry one bag anyway
+  and nothing changes.
+
+### Fixed
+
+- **The corner minimap lights up again after a level change.** The mod remembers which rooms it has
+  already revealed so it does not redraw their fog hole every frame, but the memory was keyed by
+  `Room.id` alone — a per-level index, so room 0 of the level just entered looked "already revealed"
+  by room 0 of the level just left, and its fog stayed on for the whole level. The memory is now
+  dropped whenever the live `LevelMap` is a different object, which is true for every new level, so
+  each level starts fogged and the first hero to walk in lights it.
+- **A scroll now always asks the second player.** The double-pick chain counted "passes owed" and
+  cleared the count on the second confirm; when the second screen was **closed instead of confirmed**
+  the stale count survived, the next scroll's first screen spent it, and player two silently got no
+  point on that scroll. The chain now remembers *which screen* is the pending pass and forgets it with
+  that screen's own disposal, so backing out cannot leave it armed. The corner label on each screen
+  (`P1 选择` / `P2 选择`) is likewise keyed per screen, so the two screens that briefly coexist each
+  keep exactly one line instead of stacking labels.
+- **The pause screen's scroll counters follow the P1/P2 switch.** `DefaultPause`'s constructor seeds
+  the `TierBar`'s three counters from `Game.ME.hero` once and never writes them again, so after
+  switching whose bag the screen shows, the brutality/tactics/survival numbers still described player
+  one. They are re-seeded with the switch now.
+
 ## [0.1.30] — 2026-10-30
 
 ### Fixed
